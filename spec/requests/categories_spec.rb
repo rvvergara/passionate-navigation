@@ -7,10 +7,34 @@ RSpec.describe "Categories", type: :request do
   let!(:health_vert) { create(:vertical, :valid, name: "Health") }
   let!(:internet) { create(:category, :valid, vertical: business_vert, name: "Internet")}
   let!(:weight_loss) { create(:category, :valid, name: "Weight Loss", vertical: health_vert)}
+  let(:mike) { create(:user) }
+  let!(:login) { login_as(mike) }
+
+  describe "unauthenticated requests" do
+    it {
+      get "/v1/categories"
+      expect(response).to have_http_status(401)
+    }
+    it {
+      post "/v1/categories",
+           params: { category: { name: "Social Media", vertical_id: business_vert.id } }
+      expect(response).to have_http_status(401)
+    }
+    it {
+      put "/v1/categories/#{weight_loss.id}",
+          params: { category: { name: "Weight Management", vertical_id: health_vert.id } }
+      expect(response).to have_http_status(401)
+    }
+    it {
+      delete "/v1/categories/#{internet.id}"
+      expect(response).to have_http_status(401)
+    }
+  end
 
   describe "GET /v1/categories" do
     subject do
-      get "/v1/categories"
+      get "/v1/categories",
+          headers: authorization_header
     end
 
     it "sends a success response" do
@@ -28,7 +52,8 @@ RSpec.describe "Categories", type: :request do
     context "name is missing in params" do
       subject do
         post "/v1/categories",
-             params: { category: { name: "", vertical: business_vert } }
+             params: { category: { name: "", vertical: business_vert } },
+             headers: authorization_header
       end
 
       it "does not add category to the database" do
@@ -45,7 +70,8 @@ RSpec.describe "Categories", type: :request do
     context "duplicate name" do
       subject do
         post "/v1/categories",
-             params: { category: { name: "Internet", vertical_id: business_vert.id } }
+             params: { category: { name: "Internet", vertical_id: business_vert.id } },
+             headers: authorization_header
       end
 
       it "does not add category to the database" do
@@ -62,7 +88,8 @@ RSpec.describe "Categories", type: :request do
     context "name is given and is unique" do
       subject do
         post "/v1/categories",
-             params: { category: { name: "Social Media", vertical_id: business_vert.id } }
+             params: { category: { name: "Social Media", vertical_id: business_vert.id } },
+             headers: authorization_header
       end
 
       it "adds record to the database" do
@@ -81,7 +108,8 @@ RSpec.describe "Categories", type: :request do
     context "category id in params is wrong" do
       subject do
         put "/v1/categories/#{weight_loss.id + 'ee'}",
-            params: { category: { name: "Weight Management", vertical_id: health_vert.id } }
+            params: { category: { name: "Weight Management", vertical_id: health_vert.id } },
+            headers: authorization_header
       end
 
       it "sends an error response" do
@@ -93,7 +121,8 @@ RSpec.describe "Categories", type: :request do
     context "name is missing in params" do
       subject do
         put "/v1/categories/#{weight_loss.id}",
-            params: { category: { name: "", vertical_id: health_vert.id } }
+            params: { category: { name: "", vertical_id: health_vert.id } },
+            headers: authorization_header
       end
 
       it "does change category name in the database" do
@@ -111,7 +140,8 @@ RSpec.describe "Categories", type: :request do
     context "duplicate name" do
       subject do
         put "/v1/categories/#{weight_loss.id}",
-            params: { category: { name: "Internet", vertical_id: health_vert.id } }
+            params: { category: { name: "Internet", vertical_id: health_vert.id } },
+            headers: authorization_header
       end
 
       it "does not change category name in the database" do
@@ -129,7 +159,8 @@ RSpec.describe "Categories", type: :request do
     context "name is given and is unique" do
       subject do
         put "/v1/categories/#{weight_loss.id}",
-            params: { category: { name: "Weight Management", vertical_id: health_vert.id } }
+            params: { category: { name: "Weight Management", vertical_id: health_vert.id } },
+            headers: authorization_header
       end
 
       it "changes category name in the database" do
@@ -149,7 +180,8 @@ RSpec.describe "Categories", type: :request do
   describe "DELETE /v1/categories/:id" do
     context "id in params is wrong" do
       subject do
-        delete "/v1/categories/#{internet.id + 'eeee'}"
+        delete "/v1/categories/#{internet.id + 'eeee'}",
+               headers: authorization_header
       end
 
       it "does not delete record from db" do
@@ -164,7 +196,8 @@ RSpec.describe "Categories", type: :request do
 
     context "id in params is correct" do
       subject do
-        delete "/v1/categories/#{internet.id}"
+        delete "/v1/categories/#{internet.id}",
+               headers: authorization_header
       end
 
       it "removes category record from db" do
