@@ -2,6 +2,5 @@
 
 json.count verticals.count
 json.data verticals do |vertical|
-  json.id vertical.id
-  json.name vertical.name
+  json.partial! 'v1/partials/vertical', vertical: vertical
 end
