@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+# User seed data
+john = FactoryBot.create(:user, email: "john@gmail.com")
+george = FactoryBot.create(:user, email: "george@gmail.com")
+
 # Vertical seed data
 health_vert = FactoryBot.create(:vertical, :valid, name: "Health & Fitness")
 biz_vert = FactoryBot.create(:vertical, :valid, name: "Business")
