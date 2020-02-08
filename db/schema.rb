@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_02_08_023333) do
+ActiveRecord::Schema.define(version: 2020_02_08_040635) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -26,6 +26,17 @@ ActiveRecord::Schema.define(version: 2020_02_08_023333) do
     t.index ["vertical_id"], name: "index_categories_on_vertical_id"
   end
 
+  create_table "courses", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "name", null: false
+    t.string "author", default: "", null: false
+    t.uuid "category_id", null: false
+    t.string "state", default: "active", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["category_id"], name: "index_courses_on_category_id"
+    t.index ["name"], name: "index_courses_on_name"
+  end
+
   create_table "verticals", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
@@ -34,4 +45,5 @@ ActiveRecord::Schema.define(version: 2020_02_08_023333) do
   end
 
   add_foreign_key "categories", "verticals"
+  add_foreign_key "courses", "categories"
 end
