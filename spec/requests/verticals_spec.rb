@@ -112,7 +112,7 @@ RSpec.describe "Verticals", type: :request do
             params: { vertical: { name: "Business" } }
       end
 
-      it "does change vertical name in the database" do
+      it "does not change vertical name in the database" do
         subject
         expect(jobs.name).to eq("Jobs")
       end
