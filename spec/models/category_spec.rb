@@ -41,5 +41,11 @@ RSpec.describe Category, type: :model do
     it {
       should belong_to(:vertical)
     }
+
+    it {
+      should have_many(:courses)
+        .with_foreign_key(:category_id)
+        .dependent(:destroy)
+    }
   end
 end
