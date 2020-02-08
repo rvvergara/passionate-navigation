@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class V1::VerticalsController < ApplicationController
+  before_action :pundit_user
+
   def index
     verticals = Vertical.order_created
 
