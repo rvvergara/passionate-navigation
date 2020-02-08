@@ -1,3 +1,11 @@
+# frozen_string_literal: true
+
 Rails.application.routes.draw do
-  # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
+  namespace :v1, defaults: { format: :json } do
+    resources :verticals, except: %i[new edit]
+    resources :categories, except: %i[new edit]
+    resources :courses, except: %i[new edit]
+    resources :sessions, only: %i[create]
+    resources :users, only: %i[create]
+  end
 end
