@@ -7,7 +7,12 @@ class V1::CoursesController < ApplicationController
     render :index, locals: { courses: courses }, status: :ok
   end
 
-  def show; end
+  def show
+    course = find_course
+    return unless course
+
+    render :show, locals: { course: course }, status: :ok
+  end
 
   def create
     course = Course.new(course_params)
@@ -24,6 +29,12 @@ class V1::CoursesController < ApplicationController
   def destroy; end
 
   private
+
+  def find_course
+    course = Course.find_by(id: params[:id])
+    find_error("course") unless course
+    course
+  end
 
   def course_params
     params

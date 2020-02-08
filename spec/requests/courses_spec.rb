@@ -32,6 +32,38 @@ RSpec.describe "Courses", type: :request do
     end
   end
 
+  describe "GET /v1/courses/:id" do
+    context "wrong id in params" do
+      subject do
+        get "/v1/courses/#{sales_funnel.id + 'eeee'}"
+      end
+
+      it "sends an error response" do
+        subject
+        expect(response).to have_http_status(404)
+
+        expect(JSON.parse(response.body)["message"]).to eq("Cannot find course")
+      end
+    end
+
+    context "correct id in params" do
+      subject do
+        get "/v1/courses/#{sales_funnel.id}"
+      end
+
+      it "sends a success response" do
+        subject
+        expect(response).to have_http_status(:ok)
+      end
+
+      it "shows category data" do
+        subject
+        expect(JSON.parse(response.body)["course"]["category"]["id"]).to eq(internet.id)
+        expect(JSON.parse(response.body)["course"]["category"]["name"]).to eq(internet.name)
+      end
+    end
+  end
+
   describe "POST /v1/courses" do
     context "name is missing in params" do
       subject do
