@@ -71,7 +71,7 @@ RSpec.describe "Verticals", type: :request do
     end
   end
 
-  describe "PUT /v1/verticals" do
+  describe "PUT /v1/verticals/:id" do
     let!(:jobs) { create(:vertical, :valid, name: "Jobs") }
 
     context "vertical id in params is wrong" do
@@ -140,6 +140,41 @@ RSpec.describe "Verticals", type: :request do
         subject
         expect(response).to have_http_status(202)
         expect(JSON.parse(response.body)["vertical"]["name"]).to eq("Social Media")
+      end
+    end
+  end
+
+  describe "DELETE /v1/verticals/:id" do
+    let!(:education) { create(:vertical, :valid, name: "Education") }
+
+    context "id in params is wrong" do
+      subject do
+        delete "/v1/verticals/#{education.id + 'eeee'}"
+      end
+
+      it "does not delete record from db" do
+        expect { subject }.to_not change(Vertical, :count)
+      end
+
+      it "sends an error response" do
+        subject
+        expect(response).to have_http_status(404)
+      end
+    end
+
+    context "id in params is correct" do
+      subject do
+        delete "/v1/verticals/#{education.id}"
+      end
+
+      it "removes vertical record from db" do
+        expect { subject }.to change(Vertical, :count).by(-1)
+      end
+
+      it "sends a success response" do
+        subject
+        expect(response).to have_http_status(202)
+        expect(JSON.parse(response.body)["message"]).to eq("Vertical deleted successfully")
       end
     end
   end

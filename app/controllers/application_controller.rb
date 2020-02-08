@@ -8,4 +8,10 @@ class ApplicationController < ActionController::API
   def process_error(resource, message)
     render json: { message: message, errors: resource.errors }, status: :unprocessable_entity
   end
+
+  def action_success(message, status_code = nil)
+    status_code ||= :accepted
+    render json: { message: message },
+           status: status_code
+  end
 end

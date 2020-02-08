@@ -30,7 +30,13 @@ class V1::VerticalsController < ApplicationController
     end
   end
 
-  def destroy; end
+  def destroy
+    vertical = find_vertical
+    return unless vertical
+
+    vertical&.destroy
+    action_success("Vertical deleted successfully")
+  end
 
   private
 
