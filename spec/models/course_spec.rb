@@ -29,6 +29,16 @@ RSpec.describe Course, type: :model do
         expect(invalid_course.errors["name"]).to include("can't be blank")
       end
     end
+
+    context "category_id not given" do
+      it "is invalid" do
+        valid_course.category_id = nil
+
+        valid_course.valid?
+
+        expect(valid_course.errors["category_id"]).to include("can't be blank")
+      end
+    end
   end
 
   describe "associations" do
