@@ -11,13 +11,4 @@ class V1::SessionsController < ApplicationController
       render json: { "message": "Invalid credentials" }, status: :unauthorized
     end
   end
-
-  private
-
-  def shown_attributes(user)
-    {
-      id: user.id,
-      email: user.email
-    }
-  end
 end

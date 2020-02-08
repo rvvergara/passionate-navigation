@@ -24,6 +24,13 @@ class ApplicationController < ActionController::API
     end
   end
 
+  def shown_attributes(user)
+    {
+      id: user.id,
+      email: user.email
+    }
+  end
+
   def find_error(resource_type)
     render json: { message: "Cannot find #{resource_type}" }, status: 404
   end
