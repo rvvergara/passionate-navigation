@@ -99,7 +99,7 @@ RSpec.describe "Categories", type: :request do
       it "sends a success response" do
         subject
         expect(response).to have_http_status(201)
-        expect(JSON.parse(response.body)["category"]["name"]).to eq("Social Media")
+        expect(JSON.parse(response.body)["name"]).to eq("Social Media")
       end
     end
   end
@@ -172,7 +172,7 @@ RSpec.describe "Categories", type: :request do
       it "sends a success response" do
         subject
         expect(response).to have_http_status(202)
-        expect(JSON.parse(response.body)["category"]["name"]).to eq("Weight Management")
+        expect(JSON.parse(response.body)["name"]).to eq("Weight Management")
       end
     end
   end
