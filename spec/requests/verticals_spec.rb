@@ -93,7 +93,7 @@ RSpec.describe "Verticals", type: :request do
       it "sends a success response" do
         subject
         expect(response).to have_http_status(201)
-        expect(JSON.parse(response.body)["vertical"]["name"]).to eq("Social Media")
+        expect(JSON.parse(response.body)["name"]).to eq("Social Media")
       end
     end
   end
@@ -170,7 +170,7 @@ RSpec.describe "Verticals", type: :request do
       it "sends a success response" do
         subject
         expect(response).to have_http_status(202)
-        expect(JSON.parse(response.body)["vertical"]["name"]).to eq("Social Media")
+        expect(JSON.parse(response.body)["name"]).to eq("Social Media")
       end
     end
   end
