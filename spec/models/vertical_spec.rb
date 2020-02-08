@@ -15,7 +15,8 @@ RSpec.describe Vertical, type: :model do
 
     context "name is not given" do
       it "is invalid" do
-        expect(invalid_vertical).not_to be_valid
+        invalid_vertical.valid?
+        expect(invalid_vertical.errors["name"]).to include("can't be blank")
       end
     end
 
@@ -24,8 +25,17 @@ RSpec.describe Vertical, type: :model do
         valid_vertical.save
         duplicate_vertical = build(:vertical, :valid)
 
-        expect(duplicate_vertical).to_not be_valid
+        duplicate_vertical.valid?
+        expect(duplicate_vertical.errors["name"]).to include("has already been taken")
       end
     end
+  end
+
+  describe "associations" do
+    it {
+      should have_many(:categories)
+        .with_foreign_key(:vertical_id)
+        .dependent(:destroy)
+    }
   end
 end
