@@ -24,9 +24,25 @@ class V1::CoursesController < ApplicationController
     end
   end
 
-  def update; end
+  def update
+    course = find_course
+    return unless course
 
-  def destroy; end
+    if course.update(course_params)
+      render :update, locals: { course: course }, status: :accepted
+    else
+      process_error(course, "Cannot update course")
+    end
+  end
+
+  def destroy
+    course = find_course
+    return unless course
+
+    course&.destroy
+
+    action_success("Course deleted successfully")
+  end
 
   private
 

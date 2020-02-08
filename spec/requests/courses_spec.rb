@@ -122,4 +122,96 @@ RSpec.describe "Courses", type: :request do
       end
     end
   end
+
+  describe "PUT /v1/courses/:id" do
+    context "category id in params is wrong" do
+      subject do
+        put "/v1/courses/#{sales_funnel.id + 'ee'}",
+            params: { course: { name: "Automate Your Sales Funnel",
+                                category_id: internet.id,
+                                author: "Russel Branson" } }
+      end
+
+      it "sends an error response" do
+        subject
+        expect(response).to have_http_status(404)
+      end
+    end
+
+    context "name is missing in params" do
+      subject do
+        put "/v1/courses/#{sales_funnel.id}",
+            params: { course: { name: "",
+                                category_id: internet.id,
+                                author: "Russel Branson" } }
+      end
+
+      it "does change course name in the database" do
+        subject
+        sales_funnel.reload
+        expect(sales_funnel.name).to eq("How To Build A Sales Funnel")
+      end
+
+      it "sends an error response" do
+        subject
+        expect(response).to have_http_status(422)
+        expect(JSON.parse(response.body)["errors"]["name"]).to include("can't be blank")
+      end
+    end
+
+    context "complete and valid update params" do
+      subject do
+        put "/v1/courses/#{sales_funnel.id}",
+            params: { course: { name: "Automate Your Sales Funnel",
+                                category_id: internet.id,
+                                author: "Russel Branson" } }
+      end
+
+      it "changes course name in database" do
+        subject
+        sales_funnel.reload
+        expect(sales_funnel.name).to eq("Automate Your Sales Funnel")
+      end
+
+      it "sends a success response" do
+        subject
+        expect(response).to have_http_status(:accepted)
+
+        expect(JSON.parse(response.body)["course"]["name"]).to eq("Automate Your Sales Funnel")
+      end
+    end
+  end
+
+  describe "DELETE /v1/courses/:id" do
+    context "id in params is wrong" do
+      subject do
+        delete "/v1/courses/#{sales_funnel.id + 'eeee'}"
+      end
+
+      it "does not delete record from db" do
+        expect { subject }.to_not change(Course, :count)
+      end
+
+      it "sends an error response" do
+        subject
+        expect(response).to have_http_status(404)
+      end
+    end
+
+    context "id in params is correct" do
+      subject do
+        delete "/v1/courses/#{sales_funnel.id}"
+      end
+
+      it "removes course record from db" do
+        expect { subject }.to change(Course, :count).by(-1)
+      end
+
+      it "sends a success response" do
+        subject
+        expect(response).to have_http_status(202)
+        expect(JSON.parse(response.body)["message"]).to eq("Course deleted successfully")
+      end
+    end
+  end
 end
