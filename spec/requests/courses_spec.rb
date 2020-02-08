@@ -16,9 +16,40 @@ RSpec.describe "Courses", type: :request do
                             author: "Anik Singal", category: internet)
   end
 
+  let(:mike) { create(:user) }
+  let!(:login) { login_as(mike) }
+
+  describe "unauthenticated requests" do
+    it {
+      get "/v1/courses"
+      expect(response).to have_http_status(401)
+    }
+    it {
+      post "/v1/courses",
+           params: { course: {
+             name: "Facebook Marketing 101",
+             category_id: internet.id,
+             author: "Amy Porterfield"
+           } }
+      expect(response).to have_http_status(401)
+    }
+    it {
+      put "/v1/courses/#{sales_funnel.id}",
+          params: { course: { name: "Automate Your Sales Funnel",
+                              category_id: internet.id,
+                              author: "Russel Branson" } }
+      expect(response).to have_http_status(401)
+    }
+    it {
+      delete "/v1/courses/#{sales_funnel.id}"
+      expect(response).to have_http_status(401)
+    }
+  end
+
   describe "GET /v1/courses" do
     subject do
-      get "/v1/courses"
+      get "/v1/courses",
+          headers: authorization_header
     end
 
     it "sends a success response" do
@@ -35,7 +66,8 @@ RSpec.describe "Courses", type: :request do
   describe "GET /v1/courses/:id" do
     context "wrong id in params" do
       subject do
-        get "/v1/courses/#{sales_funnel.id + 'eeee'}"
+        get "/v1/courses/#{sales_funnel.id + 'eeee'}",
+            headers: authorization_header
       end
 
       it "sends an error response" do
@@ -48,7 +80,8 @@ RSpec.describe "Courses", type: :request do
 
     context "correct id in params" do
       subject do
-        get "/v1/courses/#{sales_funnel.id}"
+        get "/v1/courses/#{sales_funnel.id}",
+            headers: authorization_header
       end
 
       it "sends a success response" do
@@ -69,7 +102,8 @@ RSpec.describe "Courses", type: :request do
       subject do
         post "/v1/courses",
              params: { course: { name: "",
-                                 author: "Amy Porterfield", category: internet } }
+                                 author: "Amy Porterfield", category: internet } },
+             headers: authorization_header
       end
 
       it "does not add course to the database" do
@@ -87,7 +121,8 @@ RSpec.describe "Courses", type: :request do
       subject do
         post "/v1/courses",
              params: { course: { name: "Facebook Marketing 101",
-                                 author: "Amy Porterfield" } }
+                                 author: "Amy Porterfield" } },
+             headers: authorization_header
       end
 
       it "does not add course to the database" do
@@ -108,7 +143,8 @@ RSpec.describe "Courses", type: :request do
                name: "Facebook Marketing 101",
                category_id: internet.id,
                author: "Amy Porterfield"
-             } }
+             } },
+             headers: authorization_header
       end
 
       it "adds record to the database" do
@@ -129,7 +165,8 @@ RSpec.describe "Courses", type: :request do
         put "/v1/courses/#{sales_funnel.id + 'ee'}",
             params: { course: { name: "Automate Your Sales Funnel",
                                 category_id: internet.id,
-                                author: "Russel Branson" } }
+                                author: "Russel Branson" } },
+            headers: authorization_header
       end
 
       it "sends an error response" do
@@ -143,7 +180,8 @@ RSpec.describe "Courses", type: :request do
         put "/v1/courses/#{sales_funnel.id}",
             params: { course: { name: "",
                                 category_id: internet.id,
-                                author: "Russel Branson" } }
+                                author: "Russel Branson" } },
+            headers: authorization_header
       end
 
       it "does change course name in the database" do
@@ -164,7 +202,8 @@ RSpec.describe "Courses", type: :request do
         put "/v1/courses/#{sales_funnel.id}",
             params: { course: { name: "Automate Your Sales Funnel",
                                 category_id: internet.id,
-                                author: "Russel Branson" } }
+                                author: "Russel Branson" } },
+            headers: authorization_header
       end
 
       it "changes course name in database" do
@@ -185,7 +224,8 @@ RSpec.describe "Courses", type: :request do
   describe "DELETE /v1/courses/:id" do
     context "id in params is wrong" do
       subject do
-        delete "/v1/courses/#{sales_funnel.id + 'eeee'}"
+        delete "/v1/courses/#{sales_funnel.id + 'eeee'}",
+               headers: authorization_header
       end
 
       it "does not delete record from db" do
@@ -200,7 +240,8 @@ RSpec.describe "Courses", type: :request do
 
     context "id in params is correct" do
       subject do
-        delete "/v1/courses/#{sales_funnel.id}"
+        delete "/v1/courses/#{sales_funnel.id}",
+               headers: authorization_header
       end
 
       it "removes course record from db" do

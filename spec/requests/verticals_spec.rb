@@ -5,11 +5,35 @@ require "rails_helper"
 RSpec.describe "Verticals", type: :request do
   let!(:business) { create(:vertical, :valid, name: "Business") }
   let!(:weight_loss) { create(:vertical, :valid, name: "Weight Loss") }
+  let(:mike) { create(:user) }
+  let!(:login) { login_as(mike) }
+
+  describe "unauthenticated requests" do
+    it {
+      get "/v1/verticals"
+      expect(response).to have_http_status(401)
+    }
+    it {
+      post "/v1/verticals",
+           params: { vertical: { name: "Business" } }
+      expect(response).to have_http_status(401)
+    }
+    it {
+      put "/v1/verticals/#{weight_loss.id}",
+          params: { vertical: { name: "Weight Management" } }
+      expect(response).to have_http_status(401)
+    }
+    it {
+      delete "/v1/verticals/#{weight_loss.id}"
+      expect(response).to have_http_status(401)
+    }
+  end
 
   describe "GET /v1/verticals" do
     context "authenticated requests" do
       it "sends data of all verticals" do
-        get "/v1/verticals"
+        get "/v1/verticals",
+            headers: authorization_header
         expect(response).to have_http_status(:ok)
         expect(JSON.parse(response.body)["count"]).to eq(2)
       end
@@ -20,7 +44,8 @@ RSpec.describe "Verticals", type: :request do
     context "name is missing in params" do
       subject do
         post "/v1/verticals",
-             params: { vertical: { name: "" } }
+             params: { vertical: { name: "" } },
+             headers: authorization_header
       end
 
       it "does not add vertical to the database" do
@@ -39,7 +64,8 @@ RSpec.describe "Verticals", type: :request do
 
       subject do
         post "/v1/verticals",
-             params: { vertical: { name: "Business" } }
+             params: { vertical: { name: "Business" } },
+             headers: authorization_header
       end
 
       it "does not add vertical to the database" do
@@ -56,7 +82,8 @@ RSpec.describe "Verticals", type: :request do
     context "name is given and is unique" do
       subject do
         post "/v1/verticals",
-             params: { vertical: { name: "Social Media" } }
+             params: { vertical: { name: "Social Media" } },
+             headers: authorization_header
       end
 
       it "adds record to the database" do
@@ -77,7 +104,8 @@ RSpec.describe "Verticals", type: :request do
     context "vertical id in params is wrong" do
       subject do
         put "/v1/verticals/#{jobs.id + 'ee'}",
-            params: { vertical: { name: "Employment" } }
+            params: { vertical: { name: "Employment" } },
+            headers: authorization_header
       end
 
       it "sends an error response" do
@@ -89,7 +117,8 @@ RSpec.describe "Verticals", type: :request do
     context "name is missing in params" do
       subject do
         put "/v1/verticals/#{jobs.id}",
-            params: { vertical: { name: "" } }
+            params: { vertical: { name: "" } },
+            headers: authorization_header
       end
 
       it "does change vertical name in the database" do
@@ -109,7 +138,8 @@ RSpec.describe "Verticals", type: :request do
 
       subject do
         put "/v1/verticals/#{jobs.id}",
-            params: { vertical: { name: "Business" } }
+            params: { vertical: { name: "Business" } },
+            headers: authorization_header
       end
 
       it "does not change vertical name in the database" do
@@ -127,7 +157,8 @@ RSpec.describe "Verticals", type: :request do
     context "name is given and is unique" do
       subject do
         put "/v1/verticals/#{jobs.id}",
-            params: { vertical: { name: "Social Media" } }
+            params: { vertical: { name: "Social Media" } },
+            headers: authorization_header
       end
 
       it "changes vertical name in the database" do
@@ -149,7 +180,8 @@ RSpec.describe "Verticals", type: :request do
 
     context "id in params is wrong" do
       subject do
-        delete "/v1/verticals/#{education.id + 'eeee'}"
+        delete "/v1/verticals/#{education.id + 'eeee'}",
+               headers: authorization_header
       end
 
       it "does not delete record from db" do
@@ -164,7 +196,8 @@ RSpec.describe "Verticals", type: :request do
 
     context "id in params is correct" do
       subject do
-        delete "/v1/verticals/#{education.id}"
+        delete "/v1/verticals/#{education.id}",
+               headers: authorization_header
       end
 
       it "removes vertical record from db" do

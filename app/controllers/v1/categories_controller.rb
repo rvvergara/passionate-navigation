@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class V1::CategoriesController < ApplicationController
+  before_action :pundit_user
+
   def index
     categories = Category.order_created
 

@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class V1::CoursesController < ApplicationController
+  before_action :pundit_user
+
   def index
     courses = Course.order_created
 

@@ -5,5 +5,7 @@ Rails.application.routes.draw do
     resources :verticals, except: %i[new edit]
     resources :categories, except: %i[new edit]
     resources :courses, except: %i[new edit]
+    resources :sessions, only: %i[create]
+    resources :users, only: %i[create]
   end
 end
